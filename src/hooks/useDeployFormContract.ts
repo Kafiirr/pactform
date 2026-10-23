@@ -1,7 +1,7 @@
 /**
  * Client-side contract deployment hook.
  * Replaces the forge-script backend endpoint for Vercel deployment.
- * Uses wagmi's deployContract to deploy PactFormCollectSplit or PactFormEscrow
+ * Uses wagmi's sendTransaction with manually encoded deploy data
  * directly from the connected wallet.
  */
 import { useCallback, useState } from 'react'
@@ -9,18 +9,35 @@ import { useWalletClient, usePublicClient } from 'wagmi'
 import { encodeDeployData } from 'viem'
 import { COLLECT_SPLIT_ABI, COLLECT_SPLIT_BYTECODE, ESCROW_ABI, ESCROW_BYTECODE } from '@/contract-artifacts'
 import { getUsdc } from '@/onchain-facts'
-import { parseUsdc } from '@/onchain-money'
 import type { PactForm } from '@/types'
 
 const CHAIN_ID = 5042
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000' as `0x${string}`
-const SIGNER_ADDRESS = (import.meta.env.VITE_PACTFORM_SIGNER_ADDRESS ||
-  import.meta.env.VITE_DEMO_INSTRUCTOR_ADDRESS || ZERO_ADDR) as `0x${string}`
 
-function padTo5<T>(arr: T[], fill: T): [T, T, T, T, T] {
-  const padded = [...arr]
-  while (padded.length < 5) padded.push(fill)
-  return padded.slice(0, 5) as [T, T, T, T, T]
+// Derive signer address from env — falls back to zero address (deploy will revert with InvalidAuthorization)
+const SIGNER_ADDRESS = (
+  import.meta.env.VITE_PACTFORM_SIGNER_ADDRESS ||
+  import.meta.env.VITE_DEMO_INSTRUCTOR_ADDRESS ||
+  ZERO_ADDR
+) as `0x${string}`
+
+function padTo5Addr(arr: (string | undefined)[]): [`0x${string}`, `0x${string}`, `0x${string}`, `0x${string}`, `0x${string}`] {
+  const padded = (arr || []).map(r => (r || ZERO_ADDR) as `0x${string}`)
+  while (padded.length < 5) padded.push(ZERO_ADDR)
+  return padded.slice(0, 5) as [`0x${string}`, `0x${string}`, `0x${string}`, `0x${string}`, `0x${string}`]
+}
+
+function padTo5Num(arr: (number | string | undefined)[]): [number, number, number, number, number] {
+  const padded = (arr || []).map(s => Number(s || 0))
+  while (padded.length < 5) padded.push(0)
+  return padded.slice(0, 5) as [number, number, number, number, number]
+}
+
+function parseUsdcLocal(amount: string): bigint {
+  if (!amount) return 0n
+  const [integer = '0', fractional = ''] = amount.split('.')
+  const frac = fractional.padEnd(6, '0').slice(0, 6)
+  return BigInt(integer) * 1_000_000n + BigInt(frac)
 }
 
 export function useDeployFormContract() {
@@ -38,18 +55,17 @@ export function useDeployFormContract() {
 
     try {
       const usdcInfo = getUsdc(CHAIN_ID)
-      if (!usdcInfo) throw new Error('USDC not found for chain')
+      if (!usdcInfo) throw new Error('USDC not found for chain ' + CHAIN_ID)
       const usdcAddress = usdcInfo.address as `0x${string}`
-      const priceRaw = parseUsdc(form.price_usdc)
-      const recipients = padTo5(
-        (form.recipients).map(r => r as `0x${string}`),
-        ZERO_ADDR
-      )
-      const splits = padTo5(
-        (form.splits).map(s => Number(s)),
-        0
-      )
+
+      const priceRaw = parseUsdcLocal(form.price_usdc || '0')
+      const recipients = padTo5Addr(form.recipients || [])
+      const splits = padTo5Num(form.splits || [])
       const creatorAddress = walletClient.account.address
+
+      if (!SIGNER_ADDRESS || SIGNER_ADDRESS === ZERO_ADDR) {
+        throw new Error('Signer address not configured. Set VITE_PACTFORM_SIGNER_ADDRESS in env.')
+      }
 
       let deployData: `0x${string}`
 
@@ -62,8 +78,8 @@ export function useDeployFormContract() {
             SIGNER_ADDRESS,
             priceRaw,
             recipients,
-            splits.map(Number) as [number, number, number, number, number],
-            Number(form.capacity || 0),
+            splits,
+            Number(form.capacity ?? 0),
             creatorAddress,
           ],
         })
@@ -76,10 +92,10 @@ export function useDeployFormContract() {
             SIGNER_ADDRESS,
             priceRaw,
             recipients,
-            splits.map(Number) as [number, number, number, number, number],
-            Number(form.goal_count || 0),
-            Number(form.capacity || 0),
-            BigInt(form.deadline_ts || 0),
+            splits,
+            Number(form.goal_count ?? 0),
+            Number(form.capacity ?? 0),
+            BigInt(form.deadline_ts ?? 0),
             creatorAddress,
           ],
         })
