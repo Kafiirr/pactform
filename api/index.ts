@@ -417,6 +417,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.json({ ok: true, signer: SIGNER_ADDRESS }); return
     }
 
+    // GET /api/debug/form/:id — raw DB row (temp debugging)
+    if (segments[0] === 'debug' && segments[1] === 'form' && segments[2]) {
+      await ensureSchema()
+      const db = getDb()
+      const row = (await db.execute({ sql: 'SELECT id, title, questions, status FROM forms WHERE id = ?', args: [segments[2]] })).rows[0]
+      if (!row) { res.status(404).json({ error: 'not found' }); return }
+      res.json({ raw_questions: row.questions, type_of: typeof row.questions, parsed: parseForm(row as Record<string, unknown>).questions }); return
+    }
+
     // POST /api/seed-demo
     if (segments[0] === 'seed-demo') {
       await seedDemo(res); return

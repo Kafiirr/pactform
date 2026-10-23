@@ -157,6 +157,8 @@ export async function ensureSchema(): Promise<void> {
       )`,
     },
   ])
+  // Add confirmation_message column if missing (older schemas)
+  await dbExecute(`ALTER TABLE forms ADD COLUMN IF NOT EXISTS confirmation_message TEXT NOT NULL DEFAULT 'Thank you!'`)
   _initialized = true
 }
 
@@ -178,12 +180,40 @@ export function parseUsdc(amount: string): bigint {
   return BigInt(integer) * 1_000_000n + BigInt(frac)
 }
 
+// Normalize question types from AI or legacy values to canonical QuestionType
+const TYPE_MAP: Record<string, string> = {
+  text: 'short_text', short: 'short_text', string: 'short_text',
+  textarea: 'long_text', long: 'long_text', paragraph: 'long_text',
+  select: 'single_choice', dropdown: 'single_choice', radio: 'single_choice',
+  multiselect: 'multiple_choice', checkbox: 'multiple_choice', checkboxes: 'multiple_choice',
+  bool: 'yes_no', boolean: 'yes_no', yesno: 'yes_no',
+  number: 'short_text', phone: 'short_text', url: 'short_text',
+}
+
+function normalizeQuestions(raw: unknown): unknown[] {
+  let arr: unknown[]
+  if (typeof raw === 'string') {
+    try { arr = JSON.parse(raw) } catch { return [] }
+  } else if (Array.isArray(raw)) {
+    arr = raw
+  } else {
+    return []
+  }
+  return arr.map((q: unknown) => {
+    if (!q || typeof q !== 'object') return q
+    const question = q as Record<string, unknown>
+    const t = String(question.type ?? '').toLowerCase()
+    const normalized = TYPE_MAP[t] ?? t
+    return { ...question, type: normalized }
+  })
+}
+
 export function parseForm(f: Record<string, unknown>) {
   return {
     ...f,
-    recipients: typeof f.recipients === 'string' ? JSON.parse(f.recipients) : f.recipients,
-    splits: typeof f.splits === 'string' ? JSON.parse(f.splits) : f.splits,
-    questions: typeof f.questions === 'string' ? JSON.parse(f.questions) : f.questions,
+    recipients: typeof f.recipients === 'string' ? JSON.parse(f.recipients) : (f.recipients ?? []),
+    splits: typeof f.splits === 'string' ? JSON.parse(f.splits) : (f.splits ?? []),
+    questions: normalizeQuestions(f.questions),
   }
 }
 
