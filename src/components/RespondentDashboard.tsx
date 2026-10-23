@@ -140,7 +140,7 @@ function SubmissionCard({
   const withdrawableAmount = BigInt((withdrawable as bigint | undefined) ?? 0n)
   const canWithdrawCS = !isEscrow && withdrawableAmount > 0n
 
-  const doWrite = (functionName: string, abi: unknown[], args: unknown[] = []) => {
+  const doWrite = (functionName: string, abi: readonly unknown[], args: unknown[] = []) => {
     if (!contractAddr) return
     if (wrongChain) { onSwitchChain(); return }
     try {

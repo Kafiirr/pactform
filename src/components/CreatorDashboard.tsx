@@ -217,7 +217,7 @@ function CreatorFormActions({ form, wrongChain, onSwitchChain }: {
   const canWithdrawEscrow = isEscrow && statusNum === 1 && BigInt((withdrawableEscrow as bigint | undefined) ?? 0n) > 0n
   const canWithdrawCS = !isEscrow && BigInt((withdrawableCS as bigint | undefined) ?? 0n) > 0n
 
-  const doWrite = (fn: string, abi: unknown[], args: unknown[] = []) => {
+  const doWrite = (fn: string, abi: readonly unknown[], args: unknown[] = []) => {
     if (!contractAddr) return
     if (wrongChain) { onSwitchChain(); return }
     try {
