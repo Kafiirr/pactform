@@ -1,9 +1,10 @@
 /**
  * Shared DB + signer utilities for Vercel serverless functions.
- * Uses Turso (libSQL) for persistence — set TURSO_URL + TURSO_AUTH_TOKEN in env.
- * Falls back to local SQLite file via libsql for dev.
+ * Uses Neon (Postgres) for persistence — set DATABASE_URL in env.
+ * Provides the same execute({sql, args}) interface as the former libSQL client
+ * so all route handlers need zero changes.
  */
-import { createClient, type Client } from '@libsql/client'
+import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
 import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts'
 import { type Hex } from 'viem'
 import crypto from 'crypto'
@@ -24,14 +25,67 @@ export const SIGNER_ADDRESS = signerAccount.address
 // DB client (singleton per lambda warm instance)
 // ---------------------------------------------------------------------------
 
-let _client: Client | null = null
+let _sql: NeonQueryFunction<false, false> | null = null
 
-export function getDb(): Client {
-  if (_client) return _client
-  const url = process.env.TURSO_URL || 'file:pactform.db'
-  const authToken = process.env.TURSO_AUTH_TOKEN
-  _client = createClient({ url, authToken })
-  return _client
+function getSql(): NeonQueryFunction<false, false> {
+  if (_sql) return _sql
+  const url = process.env.DATABASE_URL
+  if (!url) throw new Error('DATABASE_URL environment variable is not set')
+  _sql = neon(url)
+  return _sql
+}
+
+// ---------------------------------------------------------------------------
+// Thin compat wrapper: execute({sql, args}) with ? → $N substitution
+// ---------------------------------------------------------------------------
+
+type Row = Record<string, unknown>
+
+interface ExecResult {
+  rows: Row[]
+}
+
+/**
+ * Accepts either:
+ *   execute('SELECT ...') — no args
+ *   execute({ sql: 'SELECT ... WHERE id = ?', args: [id] }) — positional ?
+ * Converts ? placeholders to $1, $2, … for Postgres.
+ */
+export async function dbExecute(
+  query: string | { sql: string; args?: unknown[] }
+): Promise<ExecResult> {
+  const sql = getSql()
+  let text: string
+  let params: unknown[]
+
+  if (typeof query === 'string') {
+    text = query
+    params = []
+  } else {
+    text = query.sql
+    params = query.args ?? []
+  }
+
+  // Replace ? placeholders with $1, $2, … (left-to-right)
+  let idx = 0
+  const pgText = text.replace(/\?/g, () => `$${++idx}`)
+
+  const rows = await sql(pgText, params) as Row[]
+  return { rows }
+}
+
+// ---------------------------------------------------------------------------
+// getDb() — returns an object with the same .execute() shape as libSQL
+// ---------------------------------------------------------------------------
+
+export function getDb() {
+  return {
+    execute: dbExecute,
+    // batch() used only in ensureSchema — run sequentially
+    batch: async (queries: { sql: string; args?: unknown[] }[]) => {
+      for (const q of queries) await dbExecute(q)
+    },
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -55,7 +109,7 @@ export async function ensureSchema(): Promise<void> {
         price_usdc TEXT NOT NULL DEFAULT '0',
         capacity INTEGER NOT NULL DEFAULT 0,
         goal_count INTEGER NOT NULL DEFAULT 0,
-        deadline_ts INTEGER NOT NULL DEFAULT 0,
+        deadline_ts BIGINT NOT NULL DEFAULT 0,
         recipients TEXT NOT NULL DEFAULT '[]',
         splits TEXT NOT NULL DEFAULT '[]',
         questions TEXT NOT NULL DEFAULT '[]',
@@ -64,10 +118,9 @@ export async function ensureSchema(): Promise<void> {
         chain_id INTEGER,
         version INTEGER NOT NULL DEFAULT 1,
         style_accent TEXT NOT NULL DEFAULT '#b45309',
-        created_at INTEGER NOT NULL,
-        published_at INTEGER
+        created_at BIGINT NOT NULL,
+        published_at BIGINT
       )`,
-      args: [],
     },
     {
       sql: `CREATE TABLE IF NOT EXISTS submissions (
@@ -79,12 +132,11 @@ export async function ensureSchema(): Promise<void> {
         salt TEXT NOT NULL DEFAULT '',
         status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','authorized','confirmed','failed')),
         tx_hash TEXT,
-        auth_expiry INTEGER,
+        auth_expiry BIGINT,
         auth_signature TEXT,
-        created_at INTEGER NOT NULL,
-        confirmed_at INTEGER
+        created_at BIGINT NOT NULL,
+        confirmed_at BIGINT
       )`,
-      args: [],
     },
     {
       sql: `CREATE TABLE IF NOT EXISTS events (
@@ -93,15 +145,14 @@ export async function ensureSchema(): Promise<void> {
         contract_address TEXT NOT NULL,
         event_name TEXT NOT NULL,
         tx_hash TEXT NOT NULL,
-        block_number INTEGER NOT NULL,
+        block_number BIGINT NOT NULL,
         payer_address TEXT,
         submission_id TEXT,
         amount TEXT,
-        logged_at INTEGER NOT NULL
+        logged_at BIGINT NOT NULL
       )`,
-      args: [],
     },
-  ], 'deferred')
+  ])
   _initialized = true
 }
 
@@ -126,9 +177,9 @@ export function parseUsdc(amount: string): bigint {
 export function parseForm(f: Record<string, unknown>) {
   return {
     ...f,
-    recipients: JSON.parse(f.recipients as string),
-    splits: JSON.parse(f.splits as string),
-    questions: JSON.parse(f.questions as string),
+    recipients: typeof f.recipients === 'string' ? JSON.parse(f.recipients) : f.recipients,
+    splits: typeof f.splits === 'string' ? JSON.parse(f.splits) : f.splits,
+    questions: typeof f.questions === 'string' ? JSON.parse(f.questions) : f.questions,
   }
 }
 
