@@ -31,7 +31,9 @@ function getSql(): NeonQueryFunction<false, false> {
   if (_sql) return _sql
   const url = process.env.DATABASE_URL
   if (!url) throw new Error('DATABASE_URL environment variable is not set')
-  _sql = neon(url)
+  // Neon serverless driver requires postgresql:// scheme
+  const normalizedUrl = url.replace(/^postgres:\/\//, 'postgresql://')
+  _sql = neon(normalizedUrl)
   return _sql
 }
 
@@ -70,8 +72,10 @@ export async function dbExecute(
   let idx = 0
   const pgText = text.replace(/\?/g, () => `$${++idx}`)
 
+  // sql.query() returns Row[] directly (not {rows:[]}), so wrap it
   const result = await sql.query(pgText, params as unknown[])
-  return { rows: result.rows as Row[] }
+  const rows = Array.isArray(result) ? result : (result as { rows?: Row[] }).rows ?? []
+  return { rows: rows as Row[] }
 }
 
 // ---------------------------------------------------------------------------
