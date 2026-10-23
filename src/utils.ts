@@ -51,6 +51,19 @@ export function copyToClipboard(text: string): Promise<void> {
   return navigator.clipboard.writeText(text)
 }
 
+export function isUserRejection(error: unknown): boolean {
+  const msg = ((error as { message?: string })?.message ?? '').toLowerCase()
+  const code = (error as { code?: number | string })?.code
+  return (
+    msg.includes('user rejected') ||
+    msg.includes('user denied') ||
+    msg.includes('rejected the request') ||
+    msg.includes('action_rejected') ||
+    code === 4001 ||
+    code === 'ACTION_REJECTED'
+  )
+}
+
 export function parseOnchainError(error: unknown): string {
   const message = (error as { message?: string })?.message?.toLowerCase() ?? ''
   if (message.includes('user rejected') || (error as { code?: number })?.code === 4001) {

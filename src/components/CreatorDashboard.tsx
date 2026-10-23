@@ -9,7 +9,7 @@ import { FormBuilder } from './FormBuilder'
 import { formatUsdc, formatDeadline, copyToClipboard, formatAddress } from '../utils'
 import { buildTxExplorerUrl } from '@/onchain-facts'
 import { CHAIN_ID, ESCROW_ABI, COLLECT_SPLIT_ABI } from '../contracts'
-import { parseOnchainError } from '../utils'
+import { parseOnchainError, isUserRejection } from '../utils'
 import { toast } from 'sonner'
 
 // ---------------------------------------------------------------------------
@@ -222,7 +222,7 @@ function CreatorFormActions({ form, wrongChain, onSwitchChain }: {
     if (wrongChain) { onSwitchChain(); return }
     try {
       writeContract({ address: contractAddr, abi: abi as never, functionName: fn, args, chainId: CHAIN_ID })
-    } catch (e) { toast.error(parseOnchainError(e)) }
+    } catch (e) { if (!isUserRejection(e)) toast.error(parseOnchainError(e)) }
   }
 
   if (!contractAddr) return null
@@ -345,7 +345,7 @@ export function CreatorDashboard() {
       toast.success('Form published! Share the link with your respondents.')
       void load()
     } catch (e) {
-      toast.error((e as Error).message)
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     } finally {
       setPublishing(null)
     }
@@ -371,7 +371,7 @@ export function CreatorDashboard() {
       toast.success(action === 'delete' ? 'Form deleted.' : action === 'archive' ? 'Form archived.' : 'Form restored.')
       void load()
     } catch (e) {
-      toast.error((e as Error).message)
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     } finally {
       setActionLoading(null)
     }

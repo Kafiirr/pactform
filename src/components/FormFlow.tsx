@@ -8,7 +8,7 @@ import type { PactForm, Question, StartSubmissionResponse } from '../types'
 import { PaymentRulesCard } from './PaymentRulesCard'
 import { startSubmission, confirmSubmission, submitFreeForm } from '../api'
 import { CHAIN_ID, COLLECT_SPLIT_ABI, ESCROW_ABI, getUsdcAddress } from '../contracts'
-import { formatUsdc, formatAddress } from '../utils'
+import { formatUsdc, formatAddress, parseOnchainError, isUserRejection } from '../utils'
 import { buildTxExplorerUrl } from '@/onchain-facts'
 
 
@@ -373,14 +373,8 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
       void confirmSubmission(form.id, freshAuth.submission_id, registerTxHash).catch(() => {})
 
     } catch (e) {
-      const msg = (e as Error).message ?? 'Transaction failed'
-      // User rejected — don't show an error banner, just reset
-      if (msg.toLowerCase().includes('rejected') || msg.toLowerCase().includes('denied') || msg.toLowerCase().includes('cancel')) {
-        setPayStage('idle')
-      } else {
-        setError(msg)
-        setPayStage('idle')
-      }
+      if (!isUserRejection(e)) setError(parseOnchainError(e))
+      setPayStage('idle')
     } finally {
       setLoading(false)
     }
@@ -424,7 +418,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
       await submitFreeForm(form.id, submitterAddr, answers)
       setStep({ type: 'free_success' })
     } catch (e) {
-      setError((e as Error).message)
+      if (!isUserRejection(e)) setError(parseOnchainError(e))
     } finally {
       setLoading(false)
     }
@@ -441,7 +435,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
       const auth = await startSubmission(form.id, address, answers)
       setStep({ type: 'checkout', auth })
     } catch (e) {
-      setError((e as Error).message)
+      if (!isUserRejection(e)) setError(parseOnchainError(e))
     } finally {
       setLoading(false)
     }

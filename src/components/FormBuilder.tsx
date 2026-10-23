@@ -6,6 +6,7 @@ import { createForm, updateForm, generateFormWithAI, publishForm } from '../api'
 import { useDeployFormContract } from '../hooks/useDeployFormContract'
 import { PaymentRulesCard } from './PaymentRulesCard'
 import { toast } from 'sonner'
+import { parseOnchainError, isUserRejection } from '../utils'
 
 interface FormBuilderProps {
   editing?: PactForm
@@ -156,7 +157,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       setTab('questions')
       toast.success('Form generated! Review and adjust before saving.')
     } catch (e) {
-      toast.error((e as Error).message)
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     } finally {
       setAiLoading(false)
     }
@@ -225,7 +226,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       toast.success('Form saved as draft.')
       onSave(saved)
     } catch (e) {
-      toast.error((e as Error).message)
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     } finally {
       setSaving(false)
     }
@@ -274,7 +275,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
         onSave({ ...saved, status: 'published', contract_address: contractAddress })
       }
     } catch (e) {
-      toast.error((e as Error).message)
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     } finally {
       setPublishing(false)
     }

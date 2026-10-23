@@ -5,7 +5,7 @@ import { Loader2, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react'
 import type { RespondentSubmission } from '../types'
 import { getRespondentSubmissions } from '../api'
 import { CHAIN_ID, ESCROW_ABI, COLLECT_SPLIT_ABI } from '../contracts'
-import { formatUsdc, parseOnchainError, timeUntilDeadline } from '../utils'
+import { formatUsdc, parseOnchainError, isUserRejection, timeUntilDeadline } from '../utils'
 import { buildTxExplorerUrl } from '@/onchain-facts'
 import { toast } from 'sonner'
 
@@ -152,7 +152,7 @@ function SubmissionCard({
         chainId: CHAIN_ID,
       })
     } catch (e) {
-      toast.error(parseOnchainError(e))
+      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
     }
   }
 
