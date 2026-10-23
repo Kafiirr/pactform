@@ -4,7 +4,7 @@ import { Search, Loader2, RefreshCw } from 'lucide-react'
 import type { PactForm } from '../types'
 import { FormCard } from './FormCard'
 import { FormFlow } from './FormFlow'
-import { getPublishedForms } from '../api'
+import { getPublishedForms, seedDemo } from '../api'
 
 export function ExploreView() {
   const [forms, setForms] = useState<PactForm[]>([])
@@ -31,6 +31,7 @@ export function ExploreView() {
   const handleSeedDemo = async () => {
     setSeeding(true)
     try {
+      await seedDemo()
       await load()
     } catch {
       // ignore

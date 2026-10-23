@@ -10,6 +10,7 @@
     { "source": "/api/forms/:id/responses", "destination": "/api/forms/[id]/responses" },
     { "source": "/api/forms/:id", "destination": "/api/forms/[id]" },
     { "source": "/api/ai/generate-form", "destination": "/api/ai/generate-form" },
+    { "source": "/api/seed-demo", "destination": "/api/seed" },
     { "source": "/api/health", "destination": "/api/health" },
     { "source": "/api/forms", "destination": "/api/forms" }
   ]

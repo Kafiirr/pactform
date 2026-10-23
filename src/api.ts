@@ -145,3 +145,7 @@ export async function generateFormWithAI(prompt: string, apiKey?: string): Promi
   })
   return data.form
 }
+
+export async function seedDemo(): Promise<{ form_id: string; already_seeded?: boolean }> {
+  return request('/seed-demo', { method: 'POST' })
+}
