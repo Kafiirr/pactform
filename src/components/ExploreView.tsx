@@ -6,12 +6,25 @@ import { FormCard } from './FormCard'
 import { FormFlow } from './FormFlow'
 import { getPublishedForms, seedDemo } from '../api'
 
-export function ExploreView() {
+interface ExploreViewProps {
+  initialOpenForm?: PactForm | null
+  onOpenFormConsumed?: () => void
+}
+
+export function ExploreView({ initialOpenForm, onOpenFormConsumed }: ExploreViewProps) {
   const [forms, setForms] = useState<PactForm[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedForm, setSelectedForm] = useState<PactForm | null>(null)
   const [search, setSearch] = useState('')
   const [seeding, setSeeding] = useState(false)
+
+  // Consume a form passed in via deep link (?form=id)
+  useEffect(() => {
+    if (initialOpenForm) {
+      setSelectedForm(initialOpenForm)
+      onOpenFormConsumed?.()
+    }
+  }, [initialOpenForm, onOpenFormConsumed])
 
   const load = async () => {
     setLoading(true)

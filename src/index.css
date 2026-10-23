@@ -99,6 +99,13 @@ button:focus {
   border-radius: 14px;
 }
 
+/* Placeholder text visibility */
+input::placeholder,
+textarea::placeholder {
+  color: var(--subtle);
+  opacity: 1;
+}
+
 /* Toast override */
 [data-sonner-toaster] {
   font-family: 'DM Sans', sans-serif;

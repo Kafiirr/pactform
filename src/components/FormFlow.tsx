@@ -112,13 +112,15 @@ function QuestionView({
           onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={question.placeholder || 'Type your answer here...'}
-          className="w-full bg-transparent text-xl border-b-2 pb-2 outline-none transition-colors placeholder:opacity-40"
+          className="w-full text-xl pb-3 pt-1 outline-none transition-colors"
           style={{
-            borderColor: 'var(--border-strong)',
+            background: 'transparent',
+            borderBottom: '2px solid var(--border-strong)',
             color: 'var(--ink)',
+            caretColor: 'var(--accent)',
           }}
-          onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-          onBlur={e => (e.target.style.borderColor = 'var(--border-strong)')}
+          onFocus={e => { e.currentTarget.style.borderBottomColor = 'var(--accent)' }}
+          onBlur={e => { e.currentTarget.style.borderBottomColor = 'var(--border-strong)' }}
         />
       )}
 
@@ -130,10 +132,15 @@ function QuestionView({
           onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={question.placeholder || 'your@email.com'}
-          className="w-full bg-transparent text-xl border-b-2 pb-2 outline-none transition-colors placeholder:opacity-40"
-          style={{ borderColor: 'var(--border-strong)', color: 'var(--ink)' }}
-          onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-          onBlur={e => (e.target.style.borderColor = 'var(--border-strong)')}
+          className="w-full text-xl pb-3 pt-1 outline-none transition-colors"
+          style={{
+            background: 'transparent',
+            borderBottom: '2px solid var(--border-strong)',
+            color: 'var(--ink)',
+            caretColor: 'var(--accent)',
+          }}
+          onFocus={e => { e.currentTarget.style.borderBottomColor = 'var(--accent)' }}
+          onBlur={e => { e.currentTarget.style.borderBottomColor = 'var(--border-strong)' }}
         />
       )}
 
@@ -144,10 +151,15 @@ function QuestionView({
           onChange={e => onChange(e.target.value)}
           placeholder={question.placeholder || 'Type your answer here...'}
           rows={4}
-          className="w-full bg-transparent text-lg border-b-2 pb-2 outline-none transition-colors placeholder:opacity-40 resize-none"
-          style={{ borderColor: 'var(--border-strong)', color: 'var(--ink)' }}
-          onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
-          onBlur={e => (e.target.style.borderColor = 'var(--border-strong)')}
+          className="w-full text-lg pb-3 pt-1 outline-none transition-colors resize-none"
+          style={{
+            background: 'transparent',
+            borderBottom: '2px solid var(--border-strong)',
+            color: 'var(--ink)',
+            caretColor: 'var(--accent)',
+          }}
+          onFocus={e => { e.currentTarget.style.borderBottomColor = 'var(--accent)' }}
+          onBlur={e => { e.currentTarget.style.borderBottomColor = 'var(--border-strong)' }}
         />
       )}
 
