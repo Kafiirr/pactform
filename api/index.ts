@@ -20,6 +20,21 @@ function cors(res: VercelResponse) {
 }
 
 // ---------------------------------------------------------------------------
+// Body parser (Vercel catch-all functions may receive raw Buffer bodies)
+// ---------------------------------------------------------------------------
+function parseBody(req: VercelRequest): Record<string, unknown> {
+  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+    return parseBody(req)
+  }
+  try {
+    const raw = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : String(req.body ?? '')
+    return raw ? JSON.parse(raw) as Record<string, unknown> : {}
+  } catch {
+    return {}
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Route helpers
 // ---------------------------------------------------------------------------
 function getSegments(req: VercelRequest): string[] {
@@ -54,7 +69,7 @@ async function createForm(req: VercelRequest, res: VercelResponse) {
     creator_address, title, description = '', confirmation_message = 'Thank you for registering!',
     payment_mode, price_usdc, capacity = 0, goal_count = 0, deadline_ts = 0,
     recipients, splits, questions = [], style_accent = '#b45309',
-  } = (req.body ?? {}) as Record<string, unknown>
+  } = parseBody(req)
 
   if (!creator_address || !title || !payment_mode) {
     res.status(400).json({ error: 'Missing required fields: creator_address, title, payment_mode' }); return
@@ -96,7 +111,7 @@ async function updateForm(id: string, req: VercelRequest, res: VercelResponse) {
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Not found' }); return }
 
-  const body = (req.body ?? {}) as Record<string, unknown>
+  const body = parseBody(req)
   const isDraft = row.status === 'draft'
   const setClauses: string[] = []
   const args: unknown[] = []
@@ -148,7 +163,7 @@ async function deleteForm(id: string, res: VercelResponse) {
 async function publishForm(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { contract_address = null, chain_id = 5042 } = ((req.body ?? {}) as Record<string, unknown>)
+  const { contract_address = null, chain_id = 5042 } = (parseBody(req))
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
   if (row.payment_mode !== 'free' && !contract_address) {
@@ -165,7 +180,7 @@ async function publishForm(id: string, req: VercelRequest, res: VercelResponse) 
 async function archiveForm(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { action } = ((req.body ?? {}) as { action?: string })
+  const { action } = (parseBody(req) as { action?: string })
   const newStatus = action === 'restore' ? 'published' : 'archived'
   await db.execute({ sql: `UPDATE forms SET status=? WHERE id=?`, args: [newStatus, id] })
   res.json({ ok: true })
@@ -175,7 +190,7 @@ async function archiveForm(id: string, req: VercelRequest, res: VercelResponse) 
 async function startSubmission(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { payer_address, answers } = (req.body ?? {}) as { payer_address: string; answers: Record<string, unknown> }
+  const { payer_address, answers } = parseBody(req) as { payer_address: string; answers: Record<string, unknown> }
   if (!payer_address || !answers) { res.status(400).json({ error: 'payer_address and answers required' }); return }
 
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
@@ -237,7 +252,7 @@ async function startSubmission(id: string, req: VercelRequest, res: VercelRespon
 async function confirmSubmission(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { submission_id, tx_hash } = (req.body ?? {}) as { submission_id: string; tx_hash: string }
+  const { submission_id, tx_hash } = parseBody(req) as { submission_id: string; tx_hash: string }
   if (!submission_id || !tx_hash) { res.status(400).json({ error: 'submission_id and tx_hash required' }); return }
   await db.execute({
     sql: `UPDATE submissions SET status='confirmed', tx_hash=?, confirmed_at=? WHERE id=? AND form_id=?`,
@@ -250,7 +265,7 @@ async function confirmSubmission(id: string, req: VercelRequest, res: VercelResp
 async function submitFree(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { submitter_address, answers } = (req.body ?? {}) as { submitter_address?: string; answers: Record<string, unknown> }
+  const { submitter_address, answers } = parseBody(req) as { submitter_address?: string; answers: Record<string, unknown> }
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
   if (row.payment_mode !== 'free') { res.status(400).json({ error: 'Not a free form' }); return }
@@ -361,7 +376,7 @@ async function seedDemo(res: VercelResponse) {
 
 // POST /api/ai/generate-form
 async function generateForm(req: VercelRequest, res: VercelResponse) {
-  const { prompt, apiKey } = (req.body ?? {}) as { prompt: string; apiKey?: string }
+  const { prompt, apiKey } = parseBody(req) as { prompt: string; apiKey?: string }
   const key = apiKey || process.env.OPENROUTER_API_KEY
   if (!key) { res.status(400).json({ error: 'No OpenRouter API key' }); return }
   if (!prompt) { res.status(400).json({ error: 'prompt required' }); return }
