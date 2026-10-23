@@ -629,8 +629,8 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                 type="number"
                 value={priceUsdc}
                 onChange={e => setPriceUsdc(e.target.value)}
-                step="0.01"
-                min="0.01"
+                step="any"
+                min="0.000001"
                 disabled={paymentLocked}
                 className="w-32 rounded-xl px-3 py-2 text-lg font-bold outline-none tabular-nums"
                 style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}

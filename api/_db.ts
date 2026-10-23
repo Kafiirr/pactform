@@ -70,8 +70,8 @@ export async function dbExecute(
   let idx = 0
   const pgText = text.replace(/\?/g, () => `$${++idx}`)
 
-  const rows = await sql(pgText, params) as Row[]
-  return { rows }
+  const result = await sql.query(pgText, params as unknown[])
+  return { rows: result.rows as Row[] }
 }
 
 // ---------------------------------------------------------------------------
