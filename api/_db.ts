@@ -185,8 +185,9 @@ const TYPE_MAP: Record<string, string> = {
   text: 'short_text', short: 'short_text', string: 'short_text',
   textarea: 'long_text', long: 'long_text', paragraph: 'long_text',
   select: 'single_choice', dropdown: 'single_choice', radio: 'single_choice',
-  multiselect: 'multiple_choice', checkbox: 'multiple_choice', checkboxes: 'multiple_choice',
-  bool: 'yes_no', boolean: 'yes_no', yesno: 'yes_no',
+  multiselect: 'multiple_choice', checkboxes: 'multiple_choice',
+  // single checkbox (agree/disagree) → yes_no
+  checkbox: 'yes_no', bool: 'yes_no', boolean: 'yes_no', yesno: 'yes_no', toggle: 'yes_no',
   number: 'short_text', phone: 'short_text', url: 'short_text',
 }
 

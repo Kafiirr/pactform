@@ -188,6 +188,7 @@ async function archiveForm(id: string, req: VercelRequest, res: VercelResponse) 
 
 // POST /api/forms/:id/start-submission
 async function startSubmission(id: string, req: VercelRequest, res: VercelResponse) {
+  try {
   await ensureSchema()
   const db = getDb()
   const { payer_address, answers } = parseBody(req) as { payer_address: string; answers: Record<string, unknown> }
@@ -196,7 +197,8 @@ async function startSubmission(id: string, req: VercelRequest, res: VercelRespon
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
   if (row.status !== 'published') { res.status(400).json({ error: 'Form is not published' }); return }
-  if (!row.contract_address) { res.status(400).json({ error: 'Form has no contract' }); return }
+  // Free forms (no contract) use submit-free endpoint instead
+  if (!row.contract_address) { res.status(400).json({ error: 'Free forms use /submit-free endpoint' }); return }
 
   const chainId = (row.chain_id as number) || ARC_CHAIN_ID
   const priceRaw = parseUsdc(row.price_usdc as string)
@@ -246,6 +248,11 @@ async function startSubmission(id: string, req: VercelRequest, res: VercelRespon
     submission_id: submissionId, response_commitment: commitment, auth_signature: sig,
     auth_expiry: Number(expiry), contract_address: row.contract_address, chain_id: chainId, price_raw: priceRaw.toString(),
   })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('[start-submission error]', msg)
+    res.status(500).json({ error: msg })
+  }
 }
 
 // POST /api/forms/:id/confirm-submission
