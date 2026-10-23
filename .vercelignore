@@ -1,0 +1,16 @@
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/test/
+contracts/test-integration/
+.foundry/
+lib/
+pactform.db
+pactform.db-wal
+pactform.db-shm
+.agents/
+*.log
+dist/
+traces.jsonl
+console.jsonl
+

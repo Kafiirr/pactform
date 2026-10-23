@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    { "source": "/api/forms/creator/:address", "destination": "/api/forms/creator/[address]" },
+    { "source": "/api/forms/respondent/:address", "destination": "/api/forms/respondent/[address]" },
+    { "source": "/api/forms/:id/publish", "destination": "/api/forms/[id]/publish" },
+    { "source": "/api/forms/:id/archive", "destination": "/api/forms/[id]/archive" },
+    { "source": "/api/forms/:id/start-submission", "destination": "/api/forms/[id]/start-submission" },
+    { "source": "/api/forms/:id/confirm-submission", "destination": "/api/forms/[id]/confirm-submission" },
+    { "source": "/api/forms/:id/submit-free", "destination": "/api/forms/[id]/submit-free" },
+    { "source": "/api/forms/:id/responses", "destination": "/api/forms/[id]/responses" },
+    { "source": "/api/forms/:id", "destination": "/api/forms/[id]" },
+    { "source": "/api/ai/generate-form", "destination": "/api/ai/generate-form" },
+    { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/api/forms", "destination": "/api/forms" }
+  ]
+}

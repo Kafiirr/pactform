@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+
+# SQLite database
+pactform.db
+pactform.db-wal
+pactform.db-shm
+
+# Foundry build artifacts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Foundry libs (install via forge install on deploy)
+lib/
+
+# Arc Studio debug logs
+traces.jsonl
+console.jsonl
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
