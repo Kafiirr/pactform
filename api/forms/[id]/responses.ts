@@ -8,22 +8,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') { res.status(204).end(); return }
   if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return }
 
-  await ensureSchema()
-  const db = getDb()
-  const { id } = req.query as { id: string }
+  try {
+    await ensureSchema()
+    const db = getDb()
+    const { id } = req.query as { id: string }
 
-  const rows = (await db.execute({
-    sql: `SELECT id, payer_address, status, tx_hash, created_at, confirmed_at, response_data
-          FROM submissions WHERE form_id=? ORDER BY created_at DESC`,
-    args: [id],
-  })).rows
+    const rows = (await db.execute({
+      sql: `SELECT id, payer_address, status, tx_hash, created_at, confirmed_at, response_data
+            FROM submissions WHERE form_id=? ORDER BY created_at DESC`,
+      args: [id],
+    })).rows
 
-  const responses = rows.map(r => ({
-    ...r,
-    response_data: (() => {
-      try { return JSON.parse(r.response_data as string) } catch { return {} }
-    })(),
-  }))
+    const responses = rows.map(r => ({
+      ...r,
+      response_data: (() => {
+        try { return JSON.parse(r.response_data as string) } catch { return {} }
+      })(),
+    }))
 
-  res.json({ responses })
+    res.json({ responses })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[GET responses]', message)
+    res.status(500).json({ error: message })
+  }
 }

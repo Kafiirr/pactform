@@ -8,16 +8,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') { res.status(204).end(); return }
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
 
-  await ensureSchema()
-  const db = getDb()
-  const { id } = req.query as { id: string }
-  const { submission_id, tx_hash } = req.body as { submission_id: string; tx_hash: string }
+  try {
+    await ensureSchema()
+    const db = getDb()
+    const { id } = req.query as { id: string }
+    const { submission_id, tx_hash } = req.body as { submission_id: string; tx_hash: string }
 
-  if (!submission_id || !tx_hash) { res.status(400).json({ error: 'submission_id and tx_hash required' }); return }
+    if (!submission_id || !tx_hash) { res.status(400).json({ error: 'submission_id and tx_hash required' }); return }
 
-  await db.execute({
-    sql: `UPDATE submissions SET status='confirmed', tx_hash=?, confirmed_at=? WHERE id=? AND form_id=?`,
-    args: [tx_hash, now(), submission_id, id],
-  })
-  res.json({ ok: true })
+    await db.execute({
+      sql: `UPDATE submissions SET status='confirmed', tx_hash=?, confirmed_at=? WHERE id=? AND form_id=?`,
+      args: [tx_hash, now(), submission_id, id],
+    })
+    res.json({ ok: true })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[POST confirm-submission]', message)
+    res.status(500).json({ error: message })
+  }
 }

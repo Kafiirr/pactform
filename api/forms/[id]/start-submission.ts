@@ -10,6 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') { res.status(204).end(); return }
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
 
+  try {
   await ensureSchema()
   const db = getDb()
   const { id } = req.query as { id: string }
@@ -97,4 +98,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     chain_id: chainId,
     price_raw: priceRaw.toString(),
   })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[POST start-submission]', message)
+    res.status(500).json({ error: message })
+  }
 }

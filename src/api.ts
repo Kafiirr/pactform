@@ -139,8 +139,9 @@ export interface AiFormDraft {
 }
 
 export async function generateFormWithAI(prompt: string, apiKey?: string): Promise<AiFormDraft> {
-  return request<AiFormDraft>('/ai/generate-form', {
+  const data = await request<{ form: AiFormDraft }>('/ai/generate-form', {
     method: 'POST',
     body: JSON.stringify({ prompt, apiKey }),
   })
+  return data.form
 }
