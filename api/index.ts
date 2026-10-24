@@ -274,7 +274,7 @@ async function confirmSubmission(id: string, req: VercelRequest, res: VercelResp
 async function submitFree(id: string, req: VercelRequest, res: VercelResponse) {
   await ensureSchema()
   const db = getDb()
-  const { submitter_address, answers } = parseBody(req) as { submitter_address?: string; answers: Record<string, unknown> }
+  const { submitter_address, answers, device_id } = parseBody(req) as { submitter_address?: string; answers: Record<string, unknown>; device_id?: string }
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
   // Allow free forms AND effectively-free paid forms (price = 0, no contract)
@@ -283,12 +283,14 @@ async function submitFree(id: string, req: VercelRequest, res: VercelResponse) {
   if (!isFreeForm) { res.status(400).json({ error: 'Not a free form' }); return }
 
   const addr = submitter_address || null
+  // For anonymous users use device_id as the stable payer identifier
+  const payerKey = addr || (device_id ? `device_${device_id}` : null)
 
-  // Duplicate check: one submission per wallet address (skip for anonymous)
-  if (addr) {
+  // Duplicate check: one submission per wallet OR device
+  if (payerKey) {
     const existing = (await db.execute({
       sql: `SELECT id FROM submissions WHERE form_id=? AND payer_address=? LIMIT 1`,
-      args: [id, addr],
+      args: [id, payerKey],
     })).rows[0]
     if (existing) {
       res.status(409).json({ error: 'Already submitted', submission_id: existing.id })
@@ -300,7 +302,7 @@ async function submitFree(id: string, req: VercelRequest, res: VercelResponse) {
   const responseStr = JSON.stringify(answers ?? {})
   const commitment = '0x' + createHmac('sha256', salt).update(responseStr).digest('hex')
   const subId = generateId()
-  const payer = addr || `anon_${generateId().slice(0, 8)}`
+  const payer = payerKey || `anon_${generateId().slice(0, 8)}`
   await db.execute({
     sql: `INSERT INTO submissions (id, form_id, payer_address, response_data, response_commitment, salt,
             status, confirmed_at, created_at)

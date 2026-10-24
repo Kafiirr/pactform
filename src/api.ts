@@ -95,12 +95,13 @@ export async function confirmSubmission(formId: string, submission_id: string, t
 export async function submitFreeForm(
   formId: string,
   submitter_address: string | undefined,
-  answers: Record<string, unknown>
+  answers: Record<string, unknown>,
+  device_id?: string
 ): Promise<{ ok: boolean; submission_id?: string }> {
   const res = await fetch(`/api/forms/${formId}/submit-free`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ submitter_address, answers }),
+    body: JSON.stringify({ submitter_address, answers, device_id }),
   })
   const data = await res.json() as { ok?: boolean; submission_id?: string; error?: string }
   if (res.status === 409) throw new Error('Already submitted')
