@@ -503,7 +503,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
-      style={{ background: 'rgba(29,31,36,0.55)' }}
+      style={{ background: 'rgba(242,241,236,0.72)' }}
     >
       <motion.div
         initial={{ y: 40, opacity: 0 }}
