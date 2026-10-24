@@ -501,7 +501,18 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <select
                       value={q.type}
-                      onChange={e => setQuestions(qs => qs.map((item, i) => i === qi ? { ...item, type: e.target.value as QuestionType } : item))}
+                      onChange={e => {
+                        const newType = e.target.value as QuestionType
+                        setQuestions(qs => qs.map((item, i) => {
+                          if (i !== qi) return item
+                          const needsOptions = newType === 'single_choice' || newType === 'multiple_choice'
+                          return {
+                            ...item,
+                            type: newType,
+                            options: needsOptions ? (item.options?.length ? item.options : ['Option 1', 'Option 2']) : item.options,
+                          }
+                        }))
+                      }}
                       className="text-xs rounded-lg px-2 py-1 outline-none"
                       style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--muted)' }}
                     >

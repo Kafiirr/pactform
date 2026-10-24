@@ -185,7 +185,7 @@ function QuestionView({
         </div>
       )}
 
-      {question.type === 'single_choice' && question.options && (
+      {question.type === 'single_choice' && Array.isArray(question.options) && question.options.length > 0 && (
         <div className="space-y-2">
           {question.options.map(opt => (
             <button
@@ -213,7 +213,7 @@ function QuestionView({
         </div>
       )}
 
-      {question.type === 'multiple_choice' && question.options && (
+      {question.type === 'multiple_choice' && Array.isArray(question.options) && question.options.length > 0 && (
         <div className="space-y-2">
           {question.options.map(opt => {
             const selected = (value as string[] || []).includes(opt)
@@ -249,6 +249,11 @@ function QuestionView({
             )
           })}
         </div>
+      )}
+
+      {/* Fallback: choice question missing options */}
+      {(question.type === 'single_choice' || question.type === 'multiple_choice') && (!Array.isArray(question.options) || question.options.length === 0) && (
+        <p style={{ color: 'var(--muted)', fontStyle: 'italic', fontSize: '13px' }}>No options configured for this question.</p>
       )}
 
       {/* Navigation */}
