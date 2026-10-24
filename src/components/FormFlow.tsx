@@ -424,13 +424,27 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
   // Free form submit — no wallet or payment needed
   const handleFreeSubmit = async () => {
     setDir(1)
+    // Check localStorage for anonymous duplicate submission
+    const lsKey = `pactform_sub_${form.id}`
+    if (!address && localStorage.getItem(lsKey)) {
+      setStep({ type: 'free_success' })
+      return
+    }
     setLoading(true)
     setError(null)
     try {
-      const submitterAddr = address || `anon_${Math.random().toString(36).slice(2)}`
-      await submitFreeForm(form.id, submitterAddr, answers)
+      const submitterAddr = address || undefined
+      const result = await submitFreeForm(form.id, submitterAddr, answers)
+      // Save to localStorage so anonymous users can't re-submit
+      if (!address) localStorage.setItem(lsKey, result.submission_id ?? 'done')
       setStep({ type: 'free_success' })
     } catch (e) {
+      const msg = (e as Error).message || ''
+      // 409 = already submitted
+      if (msg.includes('Already submitted')) {
+        setStep({ type: 'free_success' })
+        return
+      }
       if (!isUserRejection(e)) setError(parseOnchainError(e))
     } finally {
       setLoading(false)

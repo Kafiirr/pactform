@@ -277,17 +277,35 @@ async function submitFree(id: string, req: VercelRequest, res: VercelResponse) {
   const { submitter_address, answers } = parseBody(req) as { submitter_address?: string; answers: Record<string, unknown> }
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
-  if (row.payment_mode !== 'free') { res.status(400).json({ error: 'Not a free form' }); return }
+  // Allow free forms AND effectively-free paid forms (price = 0, no contract)
+  const isFreeForm = row.payment_mode === 'free' || !row.contract_address ||
+    parseFloat(String(row.price_usdc ?? '0')) === 0
+  if (!isFreeForm) { res.status(400).json({ error: 'Not a free form' }); return }
+
+  const addr = submitter_address || null
+
+  // Duplicate check: one submission per wallet address (skip for anonymous)
+  if (addr) {
+    const existing = (await db.execute({
+      sql: `SELECT id FROM submissions WHERE form_id=? AND payer_address=? LIMIT 1`,
+      args: [id, addr],
+    })).rows[0]
+    if (existing) {
+      res.status(409).json({ error: 'Already submitted', submission_id: existing.id })
+      return
+    }
+  }
+
   const salt = randomBytes(32).toString('hex')
   const responseStr = JSON.stringify(answers ?? {})
   const commitment = '0x' + createHmac('sha256', salt).update(responseStr).digest('hex')
   const subId = generateId()
-  const addr = submitter_address || `anon_${generateId().slice(0, 8)}`
+  const payer = addr || `anon_${generateId().slice(0, 8)}`
   await db.execute({
     sql: `INSERT INTO submissions (id, form_id, payer_address, response_data, response_commitment, salt,
             status, confirmed_at, created_at)
           VALUES (?,?,?,?,?,?,'confirmed',?,?)`,
-    args: [subId, id, addr, responseStr, commitment, salt, now(), now()],
+    args: [subId, id, payer, responseStr, commitment, salt, now(), now()],
   })
   res.json({ ok: true, submission_id: subId })
 }
