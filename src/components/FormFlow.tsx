@@ -276,7 +276,7 @@ function QuestionView({
 
 export function FormFlow({ form, onClose }: FormFlowProps) {
   // A form is "effectively free" if it has no payment or price is 0
-  const isEffectivelyFree = form.payment_mode === 'free' || !form.contract_address || parseFloat(form.price_usdc || '0') === 0
+  const isEffectivelyFree = form.payment_mode === 'free' || parseFloat(form.price_usdc || '0') === 0
 
   const [step, setStep] = useState<Step>({ type: 'intro' })
   const [dir, setDir] = useState(1)

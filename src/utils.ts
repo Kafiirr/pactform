@@ -6,9 +6,11 @@ export function formatAddress(addr: string): string {
 
 export function formatUsdc(amount: string | number): string {
   const n = typeof amount === 'string' ? parseFloat(amount) : amount
+  // Show 2 decimal places normally, but up to 6 for sub-cent amounts
+  const decimals = n > 0 && n < 0.01 ? 6 : 2
   return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   }).format(n)
 }
 

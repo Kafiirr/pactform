@@ -199,8 +199,8 @@ async function startSubmission(id: string, req: VercelRequest, res: VercelRespon
   const row = (await db.execute({ sql: 'SELECT * FROM forms WHERE id = ?', args: [id] })).rows[0]
   if (!row) { res.status(404).json({ error: 'Form not found' }); return }
   if (row.status !== 'published') { res.status(400).json({ error: 'Form is not published' }); return }
-  // Free forms (no contract) use submit-free endpoint instead
-  if (!row.contract_address) { res.status(400).json({ error: 'Free forms use /submit-free endpoint' }); return }
+  // Form has no deployed contract — needs to be re-published
+  if (!row.contract_address) { res.status(400).json({ error: 'This form has no deployed contract. Please re-publish it from your dashboard.' }); return }
 
   const chainId = (row.chain_id as number) || ARC_CHAIN_ID
   const priceRaw = parseUsdc(row.price_usdc as string)
