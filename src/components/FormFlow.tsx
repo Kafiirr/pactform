@@ -278,7 +278,12 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
   // A form is "effectively free" if it has no payment or price is 0
   const isEffectivelyFree = form.payment_mode === 'free' || parseFloat(form.price_usdc || '0') === 0
 
-  const [step, setStep] = useState<Step>({ type: 'intro' })
+  // Check localStorage immediately — if already submitted, open on success screen
+  const alreadySubmittedLocally = (() => {
+    try { return !!localStorage.getItem(`pactform_sub_${form.id}`) } catch { return false }
+  })()
+
+  const [step, setStep] = useState<Step>(alreadySubmittedLocally ? { type: 'free_success' } : { type: 'intro' })
   const [dir, setDir] = useState(1)
   const [answers, setAnswers] = useState<Answers>({})
   const [loading, setLoading] = useState(false)
@@ -288,9 +293,6 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
 
   const { address, isConnected, chainId: walletChainId } = useAccount()
   const { switchChain } = useSwitchChain()
-
-  // Check if already registered (no longer checks server — skipped)
-  useEffect(() => {}, [address, form.id])
 
   const wrongChain = isConnected && walletChainId !== CHAIN_ID
 
@@ -758,16 +760,20 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                   >
                     <Check className="size-6" style={{ color: 'var(--success)' }} />
                   </div>
-                  <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>Submitted!</h2>
+                  <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>
+                    {alreadySubmittedLocally ? 'Already submitted' : 'Submitted!'}
+                  </h2>
                   <p className="text-sm" style={{ color: 'var(--muted)' }}>
-                    {form.confirmation_message || 'Thank you for your submission.'}
+                    {alreadySubmittedLocally
+                      ? 'You have already submitted this form from this device.'
+                      : (form.confirmation_message || 'Thank you for your submission.')}
                   </p>
                   <button
                     onClick={onClose}
                     className="w-full py-3 rounded-2xl text-sm font-semibold text-white"
                     style={{ background: form.style_accent || 'var(--accent)' }}
                   >
-                    Done
+                    Close
                   </button>
                 </div>
               )}
