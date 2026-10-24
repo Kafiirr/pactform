@@ -23,9 +23,11 @@ function cors(res: VercelResponse) {
 // Body parser (Vercel catch-all functions may receive raw Buffer bodies)
 // ---------------------------------------------------------------------------
 function parseBody(req: VercelRequest): Record<string, unknown> {
+  // Already parsed by Vercel runtime
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
-    return parseBody(req)
+    return req.body as Record<string, unknown>
   }
+  // Raw Buffer or string — parse manually
   try {
     const raw = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : String(req.body ?? '')
     return raw ? JSON.parse(raw) as Record<string, unknown> : {}
