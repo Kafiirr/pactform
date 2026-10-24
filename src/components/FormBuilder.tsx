@@ -96,7 +96,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
     const d = new Date(Date.now() + 7 * 86400 * 1000)
     return d.toISOString().slice(0, 16)
   })
-  const [styleAccent, setStyleAccent] = useState(editing?.style_accent || '#b45309')
+  const [styleAccent, setStyleAccent] = useState(editing?.style_accent || '#23336b')
 
   // Recipients (up to 5)
   const [recipients, setRecipients] = useState<string[]>(
@@ -139,7 +139,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       setPriceUsdc(draft.price_usdc || '1.00')
       setGoalCount(draft.goal_count || 3)
       setCapacity(draft.capacity || 0)
-      setStyleAccent(draft.style_accent || '#b45309')
+      setStyleAccent(draft.style_accent || '#23336b')
       if (Array.isArray(draft.questions) && draft.questions.length > 0) {
         setQuestions(draft.questions.map((q, i) => ({
           ...q,
@@ -583,7 +583,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
         <div className="space-y-4">
           {paymentLocked && (
             <div className=" px-4 py-3 flex items-start gap-2 text-sm"
-              style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.2)', color: 'var(--accent)' }}>
+              style={{ background: 'rgba(35,51,107,0.07)', border: '1px solid rgba(35,51,107,0.2)', color: 'var(--accent)' }}>
               <Lock size={15} className="mt-0.5 shrink-0" />
               <span>Payment settings are locked — they are baked into the deployed contract and cannot be changed. You can still edit questions, title, description, and confirmation message.</span>
             </div>
@@ -606,7 +606,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                   disabled={paymentLocked}
                   className="p-3  text-left transition-all"
                   style={{
-                    background: paymentMode === m.value ? 'rgba(180,83,9,0.08)' : 'var(--surface-muted)',
+                    background: paymentMode === m.value ? 'rgba(35,51,107,0.08)' : 'var(--surface-muted)',
                     border: '2px solid',
                     borderColor: paymentMode === m.value ? 'var(--accent)' : 'var(--border)',
                     cursor: paymentLocked ? 'not-allowed' : 'pointer',
