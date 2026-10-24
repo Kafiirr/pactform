@@ -275,6 +275,9 @@ function QuestionView({
 }
 
 export function FormFlow({ form, onClose }: FormFlowProps) {
+  // A form is "effectively free" if it has no payment or price is 0
+  const isEffectivelyFree = form.payment_mode === 'free' || !form.contract_address || parseFloat(form.price_usdc || '0') === 0
+
   const [step, setStep] = useState<Step>({ type: 'intro' })
   const [dir, setDir] = useState(1)
   const [answers, setAnswers] = useState<Answers>({})
@@ -413,8 +416,6 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
     setDir(1)
     if (index < form.questions.length - 1) {
       setStep({ type: 'question', index: index + 1 })
-    } else if (form.payment_mode === 'free') {
-      setStep({ type: 'payment_rules' })
     } else {
       setStep({ type: 'payment_rules' })
     }
@@ -436,11 +437,15 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
     }
   }
 
-  // Show the checkout screen. Fetches a preview auth for display purposes only.
-  // handlePay will always fetch a brand-new auth right before wallet interaction.
+  // Show the checkout screen — or submit directly if effectively free.
   const handleProceedToCheckout = async () => {
-    if (!address) return
     setDir(1)
+    // Effectively-free forms skip the wallet/contract flow entirely
+    if (isEffectivelyFree) {
+      await handleFreeSubmit()
+      return
+    }
+    if (!address) return
     setLoading(true)
     setError(null)
     try {
@@ -500,7 +505,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
           <div className="min-w-0">
             <h1 className="display text-lg sm:text-xl font-600 text-balance" style={{ color: 'var(--ink)' }}>{form.title}</h1>
             <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
-              {form.payment_mode === 'free' ? 'Free' : `${formatUsdc(form.price_usdc)} USDC`} · {form.payment_mode === 'goal_escrow' ? 'Goal Escrow' : form.payment_mode === 'free' ? 'No payment required' : 'Collect & Split'}
+              {isEffectivelyFree ? 'Free' : `${formatUsdc(form.price_usdc)} USDC`} · {form.payment_mode === 'goal_escrow' ? 'Goal Escrow' : isEffectivelyFree ? 'No payment required' : 'Collect & Split'}
             </p>
           </div>
           <button
@@ -604,7 +609,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                       >
                         Switch to Arc Mainnet
                       </button>
-                    ) : form.payment_mode === 'free' ? (
+                    ) : isEffectivelyFree ? (
                       <button
                         onClick={() => { void handleFreeSubmit() }}
                         disabled={loading}
@@ -612,7 +617,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                         style={{ background: form.style_accent || 'var(--accent)' }}
                       >
                         {loading ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-                        {loading ? 'Submitting...' : 'Submit for free'}
+                        {loading ? 'Submitting...' : 'Submit'}
                       </button>
                     ) : (
                       <button
