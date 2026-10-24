@@ -36,7 +36,7 @@ function ResponseCard({ response, index, questions }: {
 
   return (
     <div
-      className="rounded-xl overflow-hidden"
+      className=" overflow-hidden"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       {/* Header row */}
@@ -450,7 +450,7 @@ export function CreatorDashboard() {
             <Loader2 className="size-8 animate-spin" style={{ color: 'var(--accent)' }} />
           </div>
         ) : responses.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl" style={{ background: 'var(--surface-muted)' }}>
+          <div className="text-center py-12 " style={{ background: 'var(--surface-muted)' }}>
             <Users className="size-8 mx-auto mb-2" style={{ color: 'var(--subtle)' }} />
             <p className="text-sm" style={{ color: 'var(--muted)' }}>No responses yet.</p>
           </div>
@@ -477,7 +477,7 @@ export function CreatorDashboard() {
         <h2 className="display text-2xl font-600" style={{ color: 'var(--ink)' }}>My Forms</h2>
         <button
           onClick={() => { setEditingForm(undefined); setTab('build') }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white"
+          className="flex items-center gap-2 px-4 py-2.5  text-sm font-semibold text-white"
           style={{ background: 'var(--accent)' }}
         >
           <span className="text-lg leading-none">+</span> New form
@@ -489,12 +489,12 @@ export function CreatorDashboard() {
           <Loader2 className="size-8 animate-spin" style={{ color: 'var(--accent)' }} />
         </div>
       ) : forms.length === 0 ? (
-        <div className="text-center py-16 rounded-3xl" style={{ background: 'var(--surface-muted)' }}>
+        <div className="text-center py-16 " style={{ background: 'var(--surface-muted)' }}>
           <p className="text-lg font-medium mb-2" style={{ color: 'var(--ink)' }}>No forms yet</p>
           <p className="text-sm mb-5" style={{ color: 'var(--muted)' }}>Create your first funded form.</p>
           <button
             onClick={() => { setEditingForm(undefined); setTab('build') }}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+            className="px-5 py-2.5  text-sm font-semibold text-white"
             style={{ background: 'var(--accent)' }}
           >
             Create form
@@ -505,14 +505,14 @@ export function CreatorDashboard() {
           {/* Active forms: drafts + published */}
           <div className="space-y-3">
             {forms.filter(f => f.status !== 'archived').length === 0 && (
-              <div className="text-center py-10 rounded-2xl" style={{ background: 'var(--surface-muted)' }}>
+              <div className="text-center py-10 " style={{ background: 'var(--surface-muted)' }}>
                 <p className="text-sm" style={{ color: 'var(--muted)' }}>No active forms. Create one above.</p>
               </div>
             )}
             {forms.filter(f => f.status !== 'archived').map(form => (
             <div
               key={form.id}
-              className="rounded-2xl p-4"
+              className=" p-4"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             >
               <div className="flex items-start justify-between gap-3">
@@ -704,7 +704,7 @@ export function CreatorDashboard() {
                   {forms.filter(f => f.status === 'archived').map(form => (
                     <div
                       key={form.id}
-                      className="rounded-2xl p-4 opacity-70"
+                      className=" p-4 opacity-70"
                       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -748,13 +748,13 @@ export function CreatorDashboard() {
           onClick={() => setConfirmModal(null)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl p-6"
+            className="w-full max-w-sm  p-6"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 20px 60px rgba(26,18,9,0.2)' }}
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-start gap-3 mb-4">
               <div
-                className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+                className="shrink-0 w-9 h-9  flex items-center justify-center"
                 style={{ background: confirmModal.action === 'delete' ? 'rgba(190,18,60,0.10)' : 'rgba(180,83,9,0.10)' }}
               >
                 <AlertTriangle
@@ -770,14 +770,14 @@ export function CreatorDashboard() {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setConfirmModal(null)}
-                className="px-4 py-2 rounded-xl text-sm font-medium"
+                className="px-4 py-2  text-sm font-medium"
                 style={{ background: 'var(--surface-muted)', color: 'var(--muted)' }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => { void handleConfirmAction() }}
-                className="px-4 py-2 rounded-xl text-sm font-semibold text-white"
+                className="px-4 py-2  text-sm font-semibold text-white"
                 style={{ background: confirmModal.action === 'delete' ? 'var(--danger)' : confirmModal.action === 'unarchive' ? '#15803d' : 'var(--accent)' }}
               >
                 {confirmModal.action === 'delete' ? 'Delete' : confirmModal.action === 'archive' ? 'Archive' : 'Restore'}

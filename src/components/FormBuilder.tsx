@@ -52,7 +52,7 @@ function RecipientRow({
         value={address}
         onChange={e => onAddress(e.target.value)}
         placeholder="0x... recipient address"
-        className="flex-1 rounded-xl px-3 py-2 text-xs font-mono outline-none"
+        className="flex-1  px-3 py-2 text-xs font-mono outline-none"
         style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
       />
       <div className="flex items-center gap-1">
@@ -63,7 +63,7 @@ function RecipientRow({
           min={0}
           max={100}
           step={1}
-          className="w-14 rounded-xl px-2 py-2 text-xs text-center outline-none"
+          className="w-14  px-2 py-2 text-xs text-center outline-none"
           style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
         />
         <span className="text-xs" style={{ color: 'var(--muted)' }}>%</span>
@@ -344,14 +344,14 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
         <button onClick={onCancel} className="hover:opacity-60 transition-opacity">
           <ArrowLeft className="size-5" style={{ color: 'var(--muted)' }} />
         </button>
-        <h1 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>
+        <h1 style={{ fontFamily: "'Architects Daughter', cursive", fontSize: '22px', color: 'var(--ink)' }}>
           {editing ? 'Edit form' : 'New form'}
         </h1>
       </div>
 
       {/* ── AI Generate panel ── */}
       <div
-        className="rounded-2xl mb-4 overflow-hidden"
+        className=" mb-4 overflow-hidden"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
       >
         <button
@@ -375,7 +375,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
             {/* API key (BYOK) */}
             <div
-              className="flex items-center gap-2 rounded-xl px-3 py-2"
+              className="flex items-center gap-2  px-3 py-2"
               style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)' }}
             >
               <KeyRound className="size-3.5 shrink-0" style={{ color: 'var(--muted)' }} />
@@ -407,14 +407,14 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
               placeholder='e.g. "Generate a form for a Bug Bounty Program with $200 USDC prize pool" or "Create a paid workshop registration for a Solidity bootcamp"'
               rows={3}
               onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { void applyAiDraft() } }}
-              className="w-full text-sm rounded-xl px-3 py-2.5 outline-none resize-none"
+              className="w-full text-sm  px-3 py-2.5 outline-none resize-none"
               style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
             />
 
             <button
               onClick={() => { void applyAiDraft() }}
               disabled={aiLoading || !aiPrompt.trim()}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50 transition-opacity"
+              className="w-full flex items-center justify-center gap-2 py-2.5  text-sm font-semibold text-white disabled:opacity-50 transition-opacity"
               style={{ background: 'var(--accent)' }}
             >
               {aiLoading
@@ -427,7 +427,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
       {/* Title / description */}
       <div
-        className="rounded-2xl p-5 mb-4 space-y-3"
+        className=" p-5 mb-4 space-y-3"
         style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
       >
         <input
@@ -460,7 +460,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
       {/* Tabs */}
       <div
-        className="flex gap-1 p-1 rounded-xl mb-4"
+        className="flex gap-1 p-1  mb-4"
         style={{ background: 'var(--surface-muted)' }}
       >
         {tabs.map(t => (
@@ -485,7 +485,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           {questions.map((q, qi) => (
             <div
               key={q.id}
-              className="rounded-2xl p-4 space-y-3"
+              className=" p-4 space-y-3"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             >
               <div className="flex items-start gap-2">
@@ -570,7 +570,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
           <button
             onClick={() => setQuestions([...questions, newQuestion()])}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium border-2 border-dashed transition-opacity hover:opacity-70"
+            className="w-full flex items-center justify-center gap-2 py-3  text-sm font-medium border-2 border-dashed transition-opacity hover:opacity-70"
             style={{ borderColor: 'var(--border-strong)', color: 'var(--muted)' }}
           >
             <Plus className="size-4" /> Add question
@@ -582,7 +582,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       {tab === 'payment' && (
         <div className="space-y-4">
           {paymentLocked && (
-            <div className="rounded-xl px-4 py-3 flex items-start gap-2 text-sm"
+            <div className=" px-4 py-3 flex items-start gap-2 text-sm"
               style={{ background: 'rgba(180,83,9,0.07)', border: '1px solid rgba(180,83,9,0.2)', color: 'var(--accent)' }}>
               <Lock size={15} className="mt-0.5 shrink-0" />
               <span>Payment settings are locked — they are baked into the deployed contract and cannot be changed. You can still edit questions, title, description, and confirmation message.</span>
@@ -590,7 +590,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           )}
           {/* Mode */}
           <div
-            className="rounded-2xl p-4 space-y-3"
+            className=" p-4 space-y-3"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: paymentLocked ? 0.6 : 1 }}
           >
             <label className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Payment mode</label>
@@ -604,7 +604,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                   key={m.value}
                   onClick={() => !paymentLocked && setPaymentMode(m.value)}
                   disabled={paymentLocked}
-                  className="p-3 rounded-xl text-left transition-all"
+                  className="p-3  text-left transition-all"
                   style={{
                     background: paymentMode === m.value ? 'rgba(180,83,9,0.08)' : 'var(--surface-muted)',
                     border: '2px solid',
@@ -621,7 +621,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
           {/* Price — hidden for free forms */}
           {paymentMode !== 'free' && <div
-            className="rounded-2xl p-4 space-y-3"
+            className=" p-4 space-y-3"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: paymentLocked ? 0.6 : 1 }}
           >
             <label className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Registration price</label>
@@ -633,7 +633,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                 step="any"
                 min="0.000001"
                 disabled={paymentLocked}
-                className="w-32 rounded-xl px-3 py-2 text-lg font-bold outline-none tabular-nums"
+                className="w-32  px-3 py-2 text-lg font-bold outline-none tabular-nums"
                 style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
               />
               <span className="text-sm font-medium" style={{ color: 'var(--muted)' }}>USDC</span>
@@ -643,7 +643,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           {/* Goal & deadline (escrow only) */}
           {paymentMode === 'goal_escrow' && (
             <div
-              className="rounded-2xl p-4 space-y-3"
+              className=" p-4 space-y-3"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: paymentLocked ? 0.6 : 1 }}
             >
               <label className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Escrow settings</label>
@@ -656,7 +656,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                     onChange={e => setGoalCount(parseInt(e.target.value) || 0)}
                     min={1}
                     disabled={paymentLocked}
-                    className="w-full rounded-xl px-3 py-2 text-sm outline-none"
+                    className="w-full  px-3 py-2 text-sm outline-none"
                     style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
                   />
                 </div>
@@ -668,7 +668,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                     onChange={e => setCapacity(parseInt(e.target.value) || 0)}
                     min={0}
                     disabled={paymentLocked}
-                    className="w-full rounded-xl px-3 py-2 text-sm outline-none"
+                    className="w-full  px-3 py-2 text-sm outline-none"
                     style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
                   />
                 </div>
@@ -680,7 +680,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
                   value={deadlineDate}
                   onChange={e => setDeadlineDate(e.target.value)}
                   disabled={paymentLocked}
-                  className="w-full rounded-xl px-3 py-2 text-sm outline-none"
+                  className="w-full  px-3 py-2 text-sm outline-none"
                   style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', color: 'var(--ink)' }}
                 />
               </div>
@@ -689,7 +689,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
           {/* Recipients — hidden for free forms */}
           {paymentMode !== 'free' && <div
-            className="rounded-2xl p-4 space-y-3"
+            className=" p-4 space-y-3"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: paymentLocked ? 0.6 : 1 }}
           >
             <div className="flex items-center justify-between">
@@ -727,7 +727,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
 
           {/* Confirmation message */}
           <div
-            className="rounded-2xl p-4"
+            className=" p-4"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
           >
             <label className="text-sm font-semibold block mb-2" style={{ color: 'var(--ink)' }}>
@@ -753,7 +753,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           </p>
           <PaymentRulesCard form={previewForm} />
           <div
-            className="rounded-2xl p-4 text-sm"
+            className=" p-4 text-sm"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--ink-2)' }}
           >
             <strong>Questions ({questions.length}):</strong>
@@ -769,7 +769,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       {/* Errors */}
       {errors.length > 0 && (
         <div
-          className="mt-4 rounded-xl p-3 space-y-1"
+          className="mt-4  p-3 space-y-1"
           style={{ background: 'rgba(190,18,60,0.08)', border: '1px solid rgba(190,18,60,0.2)' }}
         >
           {errors.map((e, i) => (
@@ -784,7 +784,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       <div className="mt-6 flex gap-3">
         <button
           onClick={onCancel}
-          className="px-4 py-3 rounded-2xl text-sm font-medium shrink-0"
+          className="px-4 py-3  text-sm font-medium shrink-0"
           style={{ background: 'var(--surface-muted)', color: 'var(--muted)' }}
         >
           Cancel
@@ -793,7 +793,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           <button
             onClick={() => { void handleSave() }}
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold text-white disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3  text-sm font-semibold text-white disabled:opacity-50"
             style={{ background: 'var(--accent)' }}
           >
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
@@ -803,7 +803,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           <button
             onClick={() => { void handleSave() }}
             disabled={saving || publishing}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3  text-sm font-semibold disabled:opacity-50"
             style={{ background: 'var(--surface-muted)', color: 'var(--ink)', border: '1px solid var(--border)' }}
           >
             {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
@@ -812,7 +812,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
           <button
             onClick={() => { void handleSaveAndPublish() }}
             disabled={saving || publishing}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold text-white disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3  text-sm font-semibold text-white disabled:opacity-50"
             style={{ background: 'var(--accent)' }}
           >
             {publishing ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}

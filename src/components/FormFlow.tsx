@@ -90,7 +90,7 @@ function QuestionView({
 
       {/* Question label */}
       <div>
-        <h2 className="display text-2xl font-600 text-balance leading-snug" style={{ color: 'var(--ink)' }}>
+        <h2 className="text-balance leading-snug" style={{ fontFamily: "'Architects Daughter', cursive", fontSize: '26px', color: 'var(--ink)' }}>
           {question.label}
           {question.required && (
             <span className="ml-1 text-base" style={{ color: 'var(--danger)' }}>*</span>
@@ -169,14 +169,14 @@ function QuestionView({
             <button
               key={opt}
               onClick={() => { onChange(opt === 'Yes'); }}
-              className="flex-1 py-4 rounded-2xl text-base font-semibold transition-all"
+              className="flex-1 py-3 text-base font-medium transition-all"
               style={{
-                background: value === (opt === 'Yes')
-                  ? 'var(--accent)'
-                  : 'var(--surface-muted)',
-                color: value === (opt === 'Yes') ? 'white' : 'var(--ink)',
-                border: '2px solid',
-                borderColor: value === (opt === 'Yes') ? 'var(--accent)' : 'var(--border)',
+                background: value === (opt === 'Yes') ? 'var(--accent)' : 'transparent',
+                color: value === (opt === 'Yes') ? '#fbfaf6' : 'var(--ink)',
+                border: '1px solid var(--border)',
+                borderRadius: '3px',
+                boxShadow: value === (opt === 'Yes') ? 'var(--shadow-btn)' : 'none',
+                fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
               }}
             >
               {opt}
@@ -186,24 +186,26 @@ function QuestionView({
       )}
 
       {question.type === 'single_choice' && question.options && (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {question.options.map(opt => (
             <button
               key={opt}
               onClick={() => onChange(opt)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all"
               style={{
-                background: value === opt ? 'rgba(180,83,9,0.08)' : 'var(--surface-muted)',
-                border: '2px solid',
-                borderColor: value === opt ? 'var(--accent)' : 'var(--border)',
-                color: 'var(--ink)',
+                background: value === opt ? 'var(--accent)' : 'var(--surface)',
+                color: value === opt ? '#fbfaf6' : 'var(--ink)',
+                border: '1px solid var(--border)',
+                borderRadius: '3px',
+                boxShadow: value === opt ? 'var(--shadow-btn)' : 'none',
+                fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
               }}
             >
               <span
-                className="flex size-5 items-center justify-center rounded-full border-2 shrink-0"
-                style={{ borderColor: value === opt ? 'var(--accent)' : 'var(--border)' }}
+                className="flex size-4 items-center justify-center shrink-0"
+                style={{ border: `1px solid ${value === opt ? '#fbfaf6' : 'var(--border)'}`, borderRadius: '50%' }}
               >
-                {value === opt && <span className="size-2.5 rounded-full" style={{ background: 'var(--accent)' }} />}
+                {value === opt && <span className="size-2 rounded-full" style={{ background: '#fbfaf6' }} />}
               </span>
               {opt}
             </button>
@@ -212,7 +214,7 @@ function QuestionView({
       )}
 
       {question.type === 'multiple_choice' && question.options && (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {question.options.map(opt => {
             const selected = (value as string[] || []).includes(opt)
             return (
@@ -222,22 +224,25 @@ function QuestionView({
                   const arr = (value as string[] || [])
                   onChange(selected ? arr.filter(v => v !== opt) : [...arr, opt])
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-all"
                 style={{
-                  background: selected ? 'rgba(180,83,9,0.08)' : 'var(--surface-muted)',
-                  border: '2px solid',
-                  borderColor: selected ? 'var(--accent)' : 'var(--border)',
-                  color: 'var(--ink)',
+                  background: selected ? 'var(--accent)' : 'var(--surface)',
+                  color: selected ? '#fbfaf6' : 'var(--ink)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '3px',
+                  boxShadow: selected ? 'var(--shadow-btn)' : 'none',
+                  fontFamily: "'IBM Plex Sans', system-ui, sans-serif",
                 }}
               >
                 <span
-                  className="flex size-5 items-center justify-center rounded-lg border-2 shrink-0"
+                  className="flex size-4 items-center justify-center shrink-0"
                   style={{
-                    borderColor: selected ? 'var(--accent)' : 'var(--border)',
-                    background: selected ? 'var(--accent)' : 'transparent',
+                    border: `1px solid ${selected ? '#fbfaf6' : 'var(--border)'}`,
+                    borderRadius: '2px',
+                    background: selected ? '#fbfaf6' : 'transparent',
                   }}
                 >
-                  {selected && <Check className="size-3 text-white" />}
+                  {selected && <Check className="size-3" style={{ color: 'var(--accent)' }} />}
                 </span>
                 {opt}
               </button>
@@ -248,26 +253,21 @@ function QuestionView({
 
       {/* Navigation */}
       <div className="flex items-center gap-3 pt-2">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-          style={{ color: 'var(--muted)', background: 'var(--surface-muted)' }}
-        >
+        <button onClick={onBack} className="btn-ghost flex items-center gap-2" style={{ minWidth: 0, minHeight: '40px', padding: '8px 16px' }}>
           <ArrowLeft className="size-4" /> Back
         </button>
-
         <button
           onClick={onNext}
           disabled={!isAnswered}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ background: 'var(--accent)' }}
+          className="btn-accent flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+          style={{ minWidth: 0, padding: '8px 20px' }}
         >
           {isLast ? 'Review payment' : 'Continue'}
           <ArrowRight className="size-4" />
         </button>
       </div>
 
-      <p className="text-xs" style={{ color: 'var(--subtle)' }}>
+      <p className="text-xs" style={{ color: 'var(--subtle)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif" }}>
         Press Enter to continue{question.required ? ' · Required' : ' · Optional'}
       </p>
     </div>
@@ -498,43 +498,47 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
-      style={{ background: 'rgba(26,18,9,0.4)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'rgba(29,31,36,0.55)' }}
     >
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 40, opacity: 0 }}
-        className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden"
+        className="w-full sm:max-w-lg overflow-hidden"
         style={{
-          background: 'rgba(255,253,248,0.98)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 -8px 40px rgba(26,18,9,0.15), 0 24px 80px rgba(26,18,9,0.20)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '3px 3px 0 0',
+          boxShadow: 'rgba(29,31,36,0.9) 4px 4px 0px 0px',
           maxHeight: '92dvh',
           display: 'flex',
           flexDirection: 'column',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
-        {/* Accent strip */}
-        <div className="h-1.5 w-full" style={{ background: form.style_accent || 'var(--accent)' }} />
+        {/* Top accent line */}
+        <div className="h-[3px] w-full" style={{ background: form.style_accent || 'var(--accent)' }} />
 
         {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-2 pb-1">
-          <div className="w-10 h-1 rounded-full" style={{ background: 'var(--border-strong)' }} />
+          <div className="w-8 h-0.5" style={{ background: 'var(--border)' }} />
         </div>
 
         {/* Header */}
-        <div className="px-5 sm:px-6 pt-3 sm:pt-5 pb-3 sm:pb-4 flex items-start justify-between gap-3">
+        <div className="px-5 sm:px-6 pt-3 sm:pt-5 pb-3 sm:pb-4 flex items-start justify-between gap-3" style={{ borderBottom: '1px solid var(--border-light)' }}>
           <div className="min-w-0">
-            <h1 className="display text-lg sm:text-xl font-600 text-balance" style={{ color: 'var(--ink)' }}>{form.title}</h1>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+            <h1
+              className="text-balance leading-snug"
+              style={{ fontFamily: "'Architects Daughter', cursive", fontSize: '20px', color: 'var(--ink)' }}
+            >{form.title}</h1>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--muted)', fontFamily: "'IBM Plex Sans', system-ui, sans-serif" }}>
               {isEffectivelyFree ? 'Free' : `${formatUsdc(form.price_usdc)} USDC`} · {form.payment_mode === 'goal_escrow' ? 'Goal Escrow' : isEffectivelyFree ? 'No payment required' : 'Collect & Split'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-2xl leading-none mt-0.5 hover:opacity-60 transition-opacity"
-            style={{ color: 'var(--muted)' }}
+            className="text-xl leading-none mt-0.5 hover:opacity-50 transition-opacity"
+            style={{ color: 'var(--muted)', fontFamily: "'IBM Plex Sans', system-ui" }}
           >
             ×
           </button>
@@ -566,8 +570,8 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                         setStep({ type: 'payment_rules' })
                       }
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold text-white transition-all hover:scale-[1.01]"
-                    style={{ background: form.style_accent || 'var(--accent)' }}
+                    className="btn-accent w-full"
+                    style={{ background: form.style_accent || 'var(--accent)', borderColor: form.style_accent || 'var(--accent)' }}
                   >
                     Start registration <ArrowRight className="size-4" />
                   </button>
@@ -591,7 +595,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
               {step.type === 'payment_rules' && (
                 <div className="space-y-5">
                   <div>
-                    <h2 className="display text-xl font-600 mb-1" style={{ color: 'var(--ink)' }}>Review payment terms</h2>
+                    <h2 className="mb-1" style={{ fontFamily: "'Architects Daughter', cursive", fontSize: '20px', color: 'var(--ink)' }}>Review payment terms</h2>
                     <p className="text-sm" style={{ color: 'var(--muted)' }}>
                       Read carefully before connecting your wallet. These terms are set onchain and cannot be changed.
                     </p>
@@ -616,7 +620,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                           {({ show }) => (
                             <button
                               onClick={show}
-                              className="w-full py-3 rounded-2xl text-sm font-semibold text-white"
+                              className="btn-accent w-full"
                               style={{ background: form.style_accent || 'var(--accent)' }}
                             >
                               Connect wallet to continue
@@ -627,7 +631,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                     ) : wrongChain ? (
                       <button
                         onClick={() => switchChain({ chainId: CHAIN_ID })}
-                        className="flex-1 py-3 rounded-2xl text-sm font-semibold text-white"
+                        className="btn-accent flex-1"
                         style={{ background: 'var(--danger)' }}
                       >
                         Switch to Arc Mainnet
@@ -682,7 +686,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                     <Loader2 className="size-12 animate-spin" style={{ color: form.style_accent || 'var(--accent)' }} />
                   </div>
                   <div>
-                    <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>Confirming on Arc</h2>
+                    <h2 style={{ fontFamily: "\"Architects Daughter\", cursive", fontSize: "20px", color: 'var(--ink)' }}>Confirming on Arc</h2>
                     <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
                       Your transaction is being confirmed on the blockchain.
                     </p>
@@ -711,14 +715,14 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                     <Check className="size-7" style={{ color: 'var(--success)' }} />
                   </div>
                   <div>
-                    <h2 className="display text-xl font-600" style={{ color: 'var(--success)' }}>
+                    <h2 style={{ fontFamily: "\"Architects Daughter\", cursive", fontSize: "20px", color: 'var(--success)' }}>
                       Registration confirmed!
                     </h2>
                     <p className="text-sm mt-2 text-pretty" style={{ color: 'var(--muted)' }}>
                       {form.confirmation_message}
                     </p>
                   </div>
-                  <div className="glass-inner p-3 text-left space-y-1.5 text-xs">
+                  <div className="p-3 text-left space-y-1.5 text-xs" style={{ background: "var(--surface-muted)", border: "1px solid var(--border)", borderRadius: "3px" }}>
                     <div className="flex justify-between">
                       <span style={{ color: 'var(--muted)' }}>Amount paid</span>
                       <span className="font-semibold" style={{ color: 'var(--ink)' }}>{formatUsdc(form.price_usdc)} USDC</span>
@@ -743,7 +747,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                   </div>
                   <button
                     onClick={onClose}
-                    className="w-full py-3 rounded-2xl text-sm font-semibold text-white"
+                    className="btn-accent w-full"
                     style={{ background: form.style_accent || 'var(--accent)' }}
                   >
                     Done
@@ -760,7 +764,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                   >
                     <Check className="size-6" style={{ color: 'var(--success)' }} />
                   </div>
-                  <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>
+                  <h2 style={{ fontFamily: "\"Architects Daughter\", cursive", fontSize: "20px", color: 'var(--ink)' }}>
                     {alreadySubmittedLocally ? 'Already submitted' : 'Submitted!'}
                   </h2>
                   <p className="text-sm" style={{ color: 'var(--muted)' }}>
@@ -770,7 +774,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                   </p>
                   <button
                     onClick={onClose}
-                    className="w-full py-3 rounded-2xl text-sm font-semibold text-white"
+                    className="btn-accent w-full"
                     style={{ background: form.style_accent || 'var(--accent)' }}
                   >
                     Close
@@ -787,7 +791,7 @@ export function FormFlow({ form, onClose }: FormFlowProps) {
                   >
                     <Check className="size-6" style={{ color: 'var(--success)' }} />
                   </div>
-                  <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>Already registered</h2>
+                  <h2 style={{ fontFamily: "\"Architects Daughter\", cursive", fontSize: "20px", color: 'var(--ink)' }}>Already registered</h2>
                   <p className="text-sm" style={{ color: 'var(--muted)' }}>
                     This wallet has already registered for this form.
                   </p>
@@ -848,14 +852,14 @@ function CheckoutView({
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="display text-xl font-600" style={{ color: 'var(--ink)' }}>Checkout</h2>
+        <h2 style={{ fontFamily: "\"Architects Daughter\", cursive", fontSize: "20px", color: 'var(--ink)' }}>Checkout</h2>
         <p className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
           Review the payment details before confirming.
         </p>
       </div>
 
       {/* Summary */}
-      <div className="glass-inner p-4 space-y-2.5 text-sm">
+      <div className="p-4 space-y-2.5 text-sm" style={{ background: "var(--surface-muted)", border: "1px solid var(--border)", borderRadius: "3px" }}>
         <div className="flex items-start justify-between gap-3">
           <span className="shrink-0" style={{ color: 'var(--muted)' }}>Form</span>
           <span className="font-medium text-right" style={{ color: 'var(--ink)' }}>{form.title}</span>

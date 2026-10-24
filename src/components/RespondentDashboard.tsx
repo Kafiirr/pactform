@@ -172,7 +172,7 @@ function SubmissionCard({
 
   return (
     <div
-      className="rounded-2xl p-5"
+      className=" p-5"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       {/* Header */}
@@ -193,14 +193,14 @@ function SubmissionCard({
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="rounded-xl px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
+        <div className=" px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
           <p className="text-xs mb-0.5" style={{ color: 'var(--muted)' }}>Amount paid</p>
           <p className="display text-sm font-700 tabular-nums" style={{ color: 'var(--ink)' }}>
             {formatUsdc(sub.price_usdc)} USDC
           </p>
         </div>
         {isEscrow && deadlineTs > 0 && (
-          <div className="rounded-xl px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
+          <div className=" px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
             <p className="text-xs mb-0.5" style={{ color: 'var(--muted)' }}>Deadline</p>
             <p className="text-sm font-medium" style={{ color: deadlinePassed ? 'var(--danger)' : 'var(--ink)' }}>
               {deadlinePassed ? 'Passed' : timeUntilDeadline(deadlineTs)}
@@ -208,7 +208,7 @@ function SubmissionCard({
           </div>
         )}
         {isEscrow && goalNum > 0 && (
-          <div className="rounded-xl px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
+          <div className=" px-3 py-2" style={{ background: 'var(--surface-muted)' }}>
             <p className="text-xs mb-0.5" style={{ color: 'var(--muted)' }}>Registrations</p>
             <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>
               {regsNum} / {goalNum}
@@ -225,7 +225,7 @@ function SubmissionCard({
           <button
             onClick={() => doWrite('withdraw', COLLECT_SPLIT_ABI)}
             disabled={isBusy}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5  text-sm font-semibold text-white disabled:opacity-50"
             style={{ background: 'var(--accent)' }}
           >
             {isBusy ? <Loader2 className="size-3.5 animate-spin" /> : null}
@@ -238,7 +238,7 @@ function SubmissionCard({
           <button
             onClick={() => doWrite('finalize', ESCROW_ABI)}
             disabled={isBusy}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5  text-sm font-semibold text-white disabled:opacity-50"
             style={{ background: goalMet ? '#15803d' : 'var(--accent)' }}
           >
             {isBusy ? <Loader2 className="size-3.5 animate-spin" /> : null}
@@ -251,7 +251,7 @@ function SubmissionCard({
           <button
             onClick={() => doWrite('withdraw', ESCROW_ABI)}
             disabled={isBusy}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5  text-sm font-semibold text-white disabled:opacity-50"
             style={{ background: '#15803d' }}
           >
             {isBusy ? <Loader2 className="size-3.5 animate-spin" /> : null}
@@ -264,7 +264,7 @@ function SubmissionCard({
           <button
             onClick={() => doWrite('claimRefund', ESCROW_ABI)}
             disabled={isBusy}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5  text-sm font-semibold disabled:opacity-50"
             style={{ background: 'rgba(190,18,60,0.08)', color: 'var(--danger)', border: '1px solid rgba(190,18,60,0.2)' }}
           >
             {isBusy ? <Loader2 className="size-3.5 animate-spin" /> : null}
@@ -352,7 +352,7 @@ export function RespondentDashboard() {
 
       {wrongChain && (
         <div
-          className="flex items-center gap-2 p-3 rounded-xl mb-4 text-sm"
+          className="flex items-center gap-2 p-3  mb-4 text-sm"
           style={{ background: 'rgba(190,18,60,0.08)', border: '1px solid rgba(190,18,60,0.2)', color: 'var(--danger)' }}
         >
           <AlertCircle className="size-4 shrink-0" />
@@ -372,7 +372,7 @@ export function RespondentDashboard() {
           <Loader2 className="size-8 animate-spin" style={{ color: 'var(--accent)' }} />
         </div>
       ) : subs.length === 0 ? (
-        <div className="text-center py-16 rounded-3xl" style={{ background: 'var(--surface-muted)' }}>
+        <div className="text-center py-16 " style={{ background: 'var(--surface-muted)' }}>
           <p className="text-lg font-medium mb-2" style={{ color: 'var(--ink)' }}>No registrations yet</p>
           <p className="text-sm" style={{ color: 'var(--muted)' }}>Register for a form to see it here.</p>
         </div>

@@ -21,7 +21,7 @@ export function PaymentRulesCard({ form, compact }: PaymentRulesCardProps) {
     if (compact) {
       return (
         <div
-          className="rounded-xl p-3 text-xs"
+          className="p-3 text-xs"
           style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}
         >
           <div className="flex items-start gap-2">
@@ -33,7 +33,7 @@ export function PaymentRulesCard({ form, compact }: PaymentRulesCardProps) {
     }
     return (
       <div
-        className="rounded-2xl p-4"
+        className="p-4"
         style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)' }}
       >
         <div className="flex items-center gap-2 mb-3">
@@ -65,7 +65,7 @@ export function PaymentRulesCard({ form, compact }: PaymentRulesCardProps) {
   if (compact) {
     return (
       <div
-        className="rounded-xl p-3 text-xs"
+        className="p-3 text-xs"
         style={{ background: 'rgba(180,83,9,0.06)', border: '1px solid rgba(180,83,9,0.15)' }}
       >
         <div className="flex items-start gap-2">
@@ -83,7 +83,7 @@ export function PaymentRulesCard({ form, compact }: PaymentRulesCardProps) {
 
   return (
     <div
-      className="rounded-2xl p-4"
+      className="p-4"
       style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)' }}
     >
       <div className="flex items-center gap-2 mb-3">
