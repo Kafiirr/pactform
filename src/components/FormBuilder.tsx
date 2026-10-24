@@ -157,7 +157,7 @@ export function FormBuilder({ editing, onSave, onCancel }: FormBuilderProps) {
       setTab('questions')
       toast.success('Form generated! Review and adjust before saving.')
     } catch (e) {
-      if (!isUserRejection(e)) toast.error(parseOnchainError(e))
+      toast.error((e as Error).message || 'AI generation failed.')
     } finally {
       setAiLoading(false)
     }

@@ -383,28 +383,35 @@ async function seedDemo(res: VercelResponse) {
 
 // POST /api/ai/generate-form
 async function generateForm(req: VercelRequest, res: VercelResponse) {
-  const { prompt, apiKey } = parseBody(req) as { prompt: string; apiKey?: string }
-  const key = apiKey || process.env.OPENROUTER_API_KEY
-  if (!key) { res.status(400).json({ error: 'No OpenRouter API key' }); return }
-  if (!prompt) { res.status(400).json({ error: 'prompt required' }); return }
-
-  const systemPrompt = `You are a form designer. Given a description, output a JSON object with:
-{"title":string,"description":string,"confirmation_message":string,"questions":Array<{"id":string,"label":string,"type":"text"|"textarea"|"email"|"number"|"select"|"multiselect"|"checkbox","required":boolean,"options"?:string[]}>}
-Output only the JSON, no markdown, no explanation.`
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }] }),
-  })
-  if (!response.ok) { res.status(500).json({ error: `OpenRouter error: ${await response.text()}` }); return }
-  const data = await response.json() as { choices: { message: { content: string } }[] }
-  const content = data.choices?.[0]?.message?.content?.trim() || ''
   try {
-    const json = JSON.parse(content.replace(/^```json\n?/, '').replace(/\n?```$/, ''))
-    res.json({ form: json })
-  } catch {
-    res.status(500).json({ error: 'Failed to parse AI response', raw: content })
+    const { prompt, apiKey } = parseBody(req) as { prompt: string; apiKey?: string }
+    const key = apiKey || process.env.OPENROUTER_API_KEY
+    if (!key) { res.status(400).json({ error: 'No OpenRouter API key provided. Add your key in the AI panel or set OPENROUTER_API_KEY in your environment.' }); return }
+    if (!prompt) { res.status(400).json({ error: 'prompt required' }); return }
+
+    const systemPrompt = `You are a form designer. Given a description, output a JSON object with:
+{"title":string,"description":string,"confirmation_message":string,"payment_mode":"collect_split"|"goal_escrow"|"free","price_usdc":string,"goal_count":number,"capacity":number,"deadline_ts":number,"questions":Array<{"id":string,"label":string,"type":"short_text"|"long_text"|"email"|"number"|"yes_no"|"single_choice"|"multiple_choice","required":boolean,"options"?:string[]}>}
+Output only the JSON, no markdown fences, no explanation. Use type "short_text" for short answers, "long_text" for paragraphs, "single_choice" for dropdowns/radio, "multiple_choice" for checkboxes, "yes_no" for boolean.`
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'google/gemini-2.5-flash', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }] }),
+    })
+    if (!response.ok) {
+      const errText = await response.text()
+      res.status(500).json({ error: `OpenRouter error ${response.status}: ${errText}` }); return
+    }
+    const data = await response.json() as { choices: { message: { content: string } }[] }
+    const content = data.choices?.[0]?.message?.content?.trim() || ''
+    try {
+      const json = JSON.parse(content.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
+      res.json({ form: json })
+    } catch {
+      res.status(500).json({ error: 'Failed to parse AI response', raw: content.slice(0, 500) })
+    }
+  } catch (e) {
+    res.status(500).json({ error: (e as Error).message || 'AI generation failed' })
   }
 }
 
